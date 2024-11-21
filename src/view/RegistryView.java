@@ -1,20 +1,32 @@
+/**
+ * Registry View for managing student data and transcripts.
+ * 
+ * @author Omolemo Tshwaolesele
+ * @studentID 22001043
+ */
 package view;
 
 import control.RegistryController;
+import model.Module;
 import model.Student;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 public class RegistryView {
-    private final JTextArea studentListArea;
-    private final RegistryController registryController;
+    private JTextArea studentListArea; // To display all students
+    private JTextArea transcriptArea; // To display transcripts
+    private JTextField studentIdField; // Input for student ID
+    private final RegistryController registryController; // Controller for database operations
 
     public RegistryView() {
         registryController = new RegistryController();
 
-        // Setup frame
+        // Main frame setup
         JFrame frame = new JFrame("Registry Portal");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout(10, 10));
@@ -22,28 +34,16 @@ public class RegistryView {
         // Title
         JLabel title = new JLabel("Registry Management Portal", SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 24));
-        title.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
-        // Student list area
-        studentListArea = new JTextArea(15, 30);
-        studentListArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(studentListArea);
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Student List"));
+        // Panels
+        JPanel studentListPanel = createStudentListPanel();
+        JPanel transcriptPanel = createTranscriptPanel();
+        JPanel buttonPanel = createButtonPanel();
 
-        // Buttons
-        JPanel buttonPanel = new JPanel();
-        JButton viewStudentsButton = new JButton("View Students");
-        JButton addStudentButton = new JButton("Add Student");
-        buttonPanel.add(viewStudentsButton);
-        buttonPanel.add(addStudentButton);
-
-        // Add button listeners
-        viewStudentsButton.addActionListener(e -> displayStudents());
-        addStudentButton.addActionListener(e -> openAddStudentDialog());
-
-        // Add components to frame
+        // Add components to the frame
         frame.add(title, BorderLayout.NORTH);
-        frame.add(scrollPane, BorderLayout.CENTER);
+        frame.add(studentListPanel, BorderLayout.WEST);
+        frame.add(transcriptPanel, BorderLayout.CENTER);
         frame.add(buttonPanel, BorderLayout.SOUTH);
 
         frame.pack();
@@ -51,9 +51,63 @@ public class RegistryView {
         frame.setVisible(true);
     }
 
-    private void displayStudents() {
+    private JPanel createStudentListPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        // Student List Area
+        studentListArea = new JTextArea(20, 30);
+        studentListArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(studentListArea);
+
+        panel.add(new JLabel("All Students"), BorderLayout.NORTH);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private JPanel createTranscriptPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        // Transcript Area
+        transcriptArea = new JTextArea(20, 30);
+        transcriptArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(transcriptArea);
+
+        // Student ID Input
+        studentIdField = new JTextField(20);
+        JPanel idInputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        idInputPanel.add(new JLabel("Enter Student ID:"));
+        idInputPanel.add(studentIdField);
+
+        panel.add(idInputPanel, BorderLayout.NORTH);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private JPanel createButtonPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+
+        // Buttons
+        JButton viewStudentsButton = new JButton("View All Students");
+        JButton viewTranscriptButton = new JButton("View Transcript");
+        JButton saveTranscriptButton = new JButton("Save Transcript");
+
+        // Add button listeners
+        viewStudentsButton.addActionListener(e -> viewAllStudents());
+        viewTranscriptButton.addActionListener(e -> viewTranscript());
+        saveTranscriptButton.addActionListener(e -> saveTranscript());
+
+        panel.add(viewStudentsButton);
+        panel.add(viewTranscriptButton);
+        panel.add(saveTranscriptButton);
+
+        return panel;
+    }
+
+    private void viewAllStudents() {
+        studentListArea.setText(""); // Clear the area
         List<Student> students = registryController.getAllStudents();
-        studentListArea.setText(""); // Clear previous data
         if (students.isEmpty()) {
             studentListArea.append("No students found.\n");
             return;
@@ -63,57 +117,54 @@ public class RegistryView {
         }
     }
 
-    private void openAddStudentDialog() {
-        JDialog dialog = new JDialog();
-        dialog.setTitle("Add Student");
-        dialog.setLayout(new GridLayout(6, 2, 5, 5));
-        dialog.setSize(400, 300);
-        dialog.setLocationRelativeTo(null);
+    private void viewTranscript() {
+        transcriptArea.setText(""); // Clear the area
+        String studentId = studentIdField.getText().trim();
+        if (studentId.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please enter a Student ID.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        // Input fields
-        JTextField fullNameField = new JTextField();
-        JTextField programmeField = new JTextField();
-        JTextField yearOfStudyField = new JTextField();
-        JTextField studentIdField = new JTextField();
-        JTextField dateOfBirthField = new JTextField();
+        Student student = registryController.findStudentById(studentId);
+        if (student == null) {
+            transcriptArea.append("Student not found.\n");
+            return;
+        }
 
-        dialog.add(new JLabel("Full Name:"));
-        dialog.add(fullNameField);
-        dialog.add(new JLabel("Programme:"));
-        dialog.add(programmeField);
-        dialog.add(new JLabel("Year of Study:"));
-        dialog.add(yearOfStudyField);
-        dialog.add(new JLabel("Student ID:"));
-        dialog.add(studentIdField);
-        dialog.add(new JLabel("Date of Birth (YYYY-MM-DD):"));
-        dialog.add(dateOfBirthField);
+        List<Module> modules = registryController.getModulesByStudentId(studentId);
+        if (modules.isEmpty()) {
+            transcriptArea.append("No modules found for this student.\n");
+            return;
+        }
 
-        // Buttons
-        JButton saveButton = new JButton("Save");
-        JButton cancelButton = new JButton("Cancel");
+        transcriptArea.append("Transcript for Student: " + student.getFullnames() + " (ID: " + studentId + ")\n");
+        transcriptArea.append("Programme: " + student.getProgramme() + "\n");
+        transcriptArea.append("Year of Study: " + student.getYearOfStudy() + "\n\n");
+        transcriptArea.append("Modules:\n");
 
-        saveButton.addActionListener(e -> {
-            try {
-                Student student = new Student(
-                        fullNameField.getText().trim(),
-                        programmeField.getText().trim(),
-                        Integer.parseInt(yearOfStudyField.getText().trim()),
-                        studentIdField.getText().trim(),
-                        dateOfBirthField.getText().trim()
-                );
-                registryController.addStudent(student);
-                JOptionPane.showMessageDialog(dialog, "Student added successfully!");
-                dialog.dispose(); // Close dialog
-                displayStudents(); // Refresh student list
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(dialog, "Invalid input. Please check details.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        for (Module module : modules) {
+            transcriptArea.append(module.toString() + "\n");
+        }
+    }
 
-        cancelButton.addActionListener(e -> dialog.dispose());
+    private void saveTranscript() {
+        String transcript = transcriptArea.getText();
+        if (transcript.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No transcript to save.", "Save Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        dialog.add(saveButton);
-        dialog.add(cancelButton);
-        dialog.setVisible(true);
+        String studentId = studentIdField.getText().trim();
+        String filename = "transcript_" + studentId + ".txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            writer.write(transcript);
+            JOptionPane.showMessageDialog(null, "Transcript saved to " + filename, "Save Successful", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error saving transcript: " + e.getMessage(), "Save Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(RegistryView::new);
     }
 }

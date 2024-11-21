@@ -22,11 +22,9 @@ public class LoginView {
         // Title
         JLabel title = new JLabel("Student Transcript Generator", SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 24));
-        title.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
         // Input panel
         JPanel inputPanel = new JPanel(new GridLayout(3, 2, 5, 5));
-        inputPanel.setBorder(BorderFactory.createTitledBorder("Login"));
 
         usernameField = new JTextField(20);
         passwordField = new JPasswordField(20);
