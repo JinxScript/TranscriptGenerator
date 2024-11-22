@@ -119,29 +119,41 @@ public class StudentView {
         return panel;
     }
 
-    private JPanel createButtonPanel() {
-        JPanel panel = new JPanel();
+   private JPanel createButtonPanel() {
+    JPanel panel = new JPanel();
 
-        JButton saveDetailsButton = new JButton("Save Details");
-        JButton addModuleButton = new JButton("Add Module");
-        JButton calculateSGPABtn = new JButton("Calculate SGPA");
-        JButton generateTxtTranscriptButton = new JButton("Generate Transcript (TXT)");
-        JButton generatePdfTranscriptButton = new JButton("Generate Transcript (PDF)");
+    JButton saveDetailsButton = new JButton("Save Details");
+    JButton addModuleButton = new JButton("Add Module");
+    JButton calculateSGPABtn = new JButton("Calculate SGPA");
+    JButton generateTranscriptButton = new JButton("Generate Transcript");
+    JButton logoutButton = new JButton("Logout");
 
-        saveDetailsButton.addActionListener(e -> savePersonalDetails());
-        addModuleButton.addActionListener(e -> addModule());
-        calculateSGPABtn.addActionListener(e -> calculateSGPA());
-        generateTxtTranscriptButton.addActionListener(e -> generateTranscriptAsTxt());
-        generatePdfTranscriptButton.addActionListener(e -> generateTranscriptAsPdf());
+    saveDetailsButton.addActionListener(e -> savePersonalDetails());
+    addModuleButton.addActionListener(e -> addModule());
+    calculateSGPABtn.addActionListener(e -> calculateSGPA());
+    generateTranscriptButton.addActionListener(e -> generateTranscript());
+    logoutButton.addActionListener(e -> logout());
 
-        panel.add(saveDetailsButton);
-        panel.add(addModuleButton);
-        panel.add(calculateSGPABtn);
-        panel.add(generateTxtTranscriptButton);
-        panel.add(generatePdfTranscriptButton);
+    panel.add(saveDetailsButton);
+    panel.add(addModuleButton);
+    panel.add(calculateSGPABtn);
+    panel.add(generateTranscriptButton);
+    panel.add(logoutButton);
 
-        return panel;
+    return panel;
+}
+
+private void logout() {
+    // Confirm logout
+    int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want to log out?", "Logout", JOptionPane.YES_NO_OPTION);
+    if (choice == JOptionPane.YES_OPTION) {
+        // Close the current frame
+        SwingUtilities.getWindowAncestor(fullNameField).dispose();
+        // Redirect to LoginView
+        new LoginView();
     }
+}
+
 
     private void savePersonalDetails() {
         try {

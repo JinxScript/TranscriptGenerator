@@ -45,18 +45,18 @@ public void saveModule(String studentId, Module module) {
                                "VALUES (?, ?, ?, ?, ?, ?) " +
                                "ON DUPLICATE KEY UPDATE module_name = VALUES(module_name), module_mark = VALUES(module_mark), " +
                                "credits = VALUES(credits), year = VALUES(year), semester = VALUES(semester)";
-    String linkStudentToModuleQuery = "INSERT INTO student_modules (student_id, module_id) " +
-                                       "VALUES (?, (SELECT module_id FROM modules WHERE module_code = ?))";
+    String linkStudentToModuleQuery = "INSERT INTO student_modules (student_id, module_id, module_mark) " +
+                                       "VALUES (?, (SELECT module_id FROM modules WHERE module_code = ?), ?)";
 
     try (Connection connection = dbConnector.getConnection()) {
         // Insert or update the module in the modules table
         try (PreparedStatement moduleStmt = connection.prepareStatement(insertModuleQuery)) {
             moduleStmt.setString(1, module.getModuleCode());
             moduleStmt.setString(2, module.getModuleName());
-            moduleStmt.setDouble(3, module.getModuleMark()); // Ensure marks are provided
+            moduleStmt.setDouble(3, module.getModuleMark());
             moduleStmt.setInt(4, module.getNumberOfCredits());
             moduleStmt.setInt(5, module.getModuleYear());
-            moduleStmt.setString(6, String.valueOf(module.getModuleSemester()));
+            moduleStmt.setInt(6, module.getModuleSemester());
             int rowsAffected = moduleStmt.executeUpdate();
             System.out.println("Module table updated: Rows affected = " + rowsAffected);
         }
@@ -65,16 +65,16 @@ public void saveModule(String studentId, Module module) {
         try (PreparedStatement studentModuleStmt = connection.prepareStatement(linkStudentToModuleQuery)) {
             studentModuleStmt.setString(1, studentId);
             studentModuleStmt.setString(2, module.getModuleCode());
+            studentModuleStmt.setDouble(3, module.getModuleMark());
             int rowsAffected = studentModuleStmt.executeUpdate();
             System.out.println("Student-Module link created: Rows affected = " + rowsAffected);
         }
-
-        System.out.println("Module saved and linked to student successfully.");
     } catch (SQLException e) {
         System.out.println("Error while saving module: " + e.getMessage());
         e.printStackTrace();
     }
 }
+
 
 
     // Retrieve a student by ID
