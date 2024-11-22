@@ -1,8 +1,5 @@
 
 package control;
-///ADD DISPOSE FUNCCTION
-
-
 import model.Student;
 import model.Module;
 

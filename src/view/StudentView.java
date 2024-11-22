@@ -126,18 +126,27 @@ public class StudentView {
     JButton addModuleButton = new JButton("Add Module");
     JButton calculateSGPABtn = new JButton("Calculate SGPA");
     JButton generateTranscriptButton = new JButton("Generate Transcript");
+    JButton generateTxtTranscriptButton = new JButton("Generate Transcript (TXT)");
+    JButton generatePdfTranscriptButton = new JButton("Generate Transcript (PDF)");
+
     JButton logoutButton = new JButton("Logout");
 
+    
     saveDetailsButton.addActionListener(e -> savePersonalDetails());
     addModuleButton.addActionListener(e -> addModule());
     calculateSGPABtn.addActionListener(e -> calculateSGPA());
+     generateTxtTranscriptButton.addActionListener(e -> generateTranscriptAsTxt());
+        generatePdfTranscriptButton.addActionListener(e -> generateTranscriptAsPdf());
     generateTranscriptButton.addActionListener(e -> generateTranscript());
+    
     logoutButton.addActionListener(e -> logout());
 
     panel.add(saveDetailsButton);
     panel.add(addModuleButton);
     panel.add(calculateSGPABtn);
     panel.add(generateTranscriptButton);
+            panel.add(generateTxtTranscriptButton);
+        panel.add(generatePdfTranscriptButton);
     panel.add(logoutButton);
 
     return panel;
@@ -212,8 +221,8 @@ private void addModule() {
 
 
 
- // GENERATING A TRANSCRIPT AS TXT
-private void generateTranscriptAsTxt() {
+// GENERATING A TRANSCRIPT AS TXT
+ private void generateTranscriptAsTxt() {
     if (student == null) {
         JOptionPane.showMessageDialog(null, "No student details available to generate transcript.", "Error", JOptionPane.ERROR_MESSAGE);
         return;
@@ -242,34 +251,31 @@ private void generateTranscriptAsTxt() {
                 // Replace with the student's program dynamically
                 writer.write(year + " - " + (year + 1) + " SEMESTER " + semester + " " + student.getProgramme() + "\n");
                 writer.write("__________________________________________________________________________________________________\n");
-                writer.write(String.format("%-20s %-40s %-8s\n", "MODULE CODE", "MODULE DESCRIPTION", "CREDITS"));
+                writer.write(String.format("%-20s %-40s %-8s\n", "MODULE CODE", "MODULE DESCRIPTION", "GRADE","CREDITS"));
                 writer.write("____________________________________________________________________________________________________\n");
 
                 // Write Modules for the current year and semester
                 boolean moduleWritten = false;
                 for (Module module : modules) {
                     if (module.getModuleYear() == year && module.getModuleSemester() == semester) {
-                        writer.write(String.format("%-20s %-40s %-8s\n", 
-                            module.getModuleCode(),
-                            module.getModuleName(),
-                            module.getNumberOfCredits()));
-                        moduleWritten = true;
+                        writer.write(String.format("%-20s %-40s %-8.2f %-8s %-8d\n", 
+                                                   module.getModuleCode(),
+                                                   module.getModuleName(),
+                                                   module.getModuleMark(),
+                                                   module.getGradeLetter(),
+                                                   module.getNumberOfCredits()));
                     }
-                }
-
-                if (!moduleWritten) {
-                    writer.write("No modules found for this semester.\n");
                 }
             }
         }
 
-        // Write SGPA and CGPA
+        // Calculate SGPA and CGPA
         Transcript transcript = new Transcript(student);
         modules.forEach(transcript::addModule);
         transcript.calculateSGPA();
         transcript.calculateCGPA();
 
-        writer.write("\nResults: Academic Good Standing\n");
+       // writer.write("\nResults: Academic Good Standing\n");
         writer.write("SGPA: " + String.format("%.2f", transcript.getSGPA()) + "\n");
         writer.write("CGPA: " + String.format("%.2f", transcript.getCGPA()) + "\n");
         writer.close();
@@ -280,6 +286,7 @@ private void generateTranscriptAsTxt() {
         e.printStackTrace();
     }
 }
+
 // GENERATING A TRANSCRIPT AS PDF
 private void generateTranscriptAsPdf() {
     if (student == null) {
@@ -317,17 +324,18 @@ private void generateTranscriptAsPdf() {
                 // Replace with the student's program dynamically
                 document.add(new com.itextpdf.text.Paragraph(year + " - " + (year + 1) + " SEMESTER " + semester + " " + student.getProgramme()));
                 document.add(new com.itextpdf.text.Paragraph("________________________________________________________"));
-                document.add(new com.itextpdf.text.Paragraph(String.format("%-20s %-40s %-8s", 
-                    "MODULE CODE", "MODULE DESCRIPTION", "CREDITS")));
-                document.add(new com.itextpdf.text.Paragraph("________________________________________________________"));
+                document.add(new com.itextpdf.text.Paragraph(String.format("%-20s %-40s %-8s %-8s %-8s", 
+                    "MODULE CODE", "MODULE DESCRIPTION", "MARKS", "GRADE", "CREDITS")));
 
                 // Write Modules for the current year and semester
                 boolean moduleWritten = false;
                 for (Module module : modules) {
                     if (module.getModuleYear() == year && module.getModuleSemester() == semester) {
-                        document.add(new com.itextpdf.text.Paragraph(String.format("%-20s %-40s %-8s", 
+                        document.add(new com.itextpdf.text.Paragraph(String.format("%-20s %-40s %-8.2f %-8s %-8d", 
                             module.getModuleCode(),
                             module.getModuleName(),
+                            module.getModuleMark(),
+                            module.getGradeLetter(),
                             module.getNumberOfCredits())));
                         moduleWritten = true;
                     }
@@ -356,6 +364,7 @@ private void generateTranscriptAsPdf() {
         e.printStackTrace();
     }
 }
+
 
 
 

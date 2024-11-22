@@ -1,10 +1,7 @@
 /**
- *
- * @author Omolemo Tshwaolesele
- * @studentID 22001043
+ * Module Class
  */
 package model;
-
 
 public class Module {
     private String moduleCode;
@@ -29,48 +26,34 @@ public class Module {
         return moduleCode;
     }
 
-    public void setModuleCode(String moduleCode) {
-        this.moduleCode = moduleCode;
-    }
-
     public String getModuleName() {
         return moduleName;
-    }
-
-    public void setModuleName(String moduleName) {
-        this.moduleName = moduleName;
     }
 
     public double getModuleMark() {
         return moduleMark;
     }
 
-    public void setModuleMark(double moduleMark) {
-        this.moduleMark = moduleMark;
-    }
-
     public int getNumberOfCredits() {
         return numberOfCredits;
-    }
-
-    public void setNumberOfCredits(int numberOfCredits) {
-        this.numberOfCredits = numberOfCredits;
     }
 
     public int getModuleYear() {
         return moduleYear;
     }
 
-    public void setModuleYear(int moduleYear) {
-        this.moduleYear = moduleYear;
-    }
-
     public int getModuleSemester() {
         return moduleSemester;
     }
 
-    public void setModuleSemester(int moduleSemester) {
-        this.moduleSemester = moduleSemester;
+    // Method to determine the grade letter
+    public String getGradeLetter() {
+        if (moduleMark >= 90) return "A+";
+        else if (moduleMark >= 80) return "A";
+        else if (moduleMark >= 70) return "B";
+        else if (moduleMark >= 60) return "C";
+        else if (moduleMark >= 50) return "D";
+        else return "F";
     }
 
     @Override
@@ -82,6 +65,7 @@ public class Module {
                 ", numberOfCredits=" + numberOfCredits +
                 ", moduleYear=" + moduleYear +
                 ", moduleSemester=" + moduleSemester +
+                ", grade='" + getGradeLetter() + '\'' +
                 '}';
     }
 }
