@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class StudentView {
 
@@ -158,35 +160,47 @@ public class StudentView {
         }
     }
 
-    private void addModule() {
-        try {
-            if (student == null) {
-                JOptionPane.showMessageDialog(null, "Please save personal details first.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            String moduleCode = moduleCodeField.getText().trim();
-            String moduleName = moduleNameField.getText().trim();
-            double moduleMark = Double.parseDouble(moduleMarkField.getText().trim());
-            int credits = Integer.parseInt(numberOfCreditsField.getText().trim());
-            int year = Integer.parseInt(moduleYearField.getText().trim());
-            int semester = Integer.parseInt(moduleSemesterField.getText().trim());
-
-            Module module = new Module(moduleCode, moduleName, moduleMark, credits, year, semester);
-
-            // Save module to database
-            studentController.saveModule(student.getStudentId(), module);
-
-            // Add to in-memory list
-            modules.add(module);
-            JOptionPane.showMessageDialog(null, "Module added successfully!");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Invalid module input. Please check your details.", "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+private void addModule() {
+    try {
+        if (student == null) {
+            JOptionPane.showMessageDialog(null, "Please save personal details first.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
-    }
 
-  // GENERATING A TRANSCRIPT AS TXT
+        // Validate input fields
+        String moduleCode = moduleCodeField.getText().trim();
+        String moduleName = moduleNameField.getText().trim();
+        String moduleMarkStr = moduleMarkField.getText().trim();
+        int credits = Integer.parseInt(numberOfCreditsField.getText().trim());
+        int year = Integer.parseInt(moduleYearField.getText().trim());
+        int semester = Integer.parseInt(moduleSemesterField.getText().trim());
+
+        if (moduleCode.isEmpty() || moduleName.isEmpty() || moduleMarkStr.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please fill in all module details, including marks.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        double moduleMark = Double.parseDouble(moduleMarkStr);
+
+        // Create module and save to database
+        Module module = new Module(moduleCode, moduleName, moduleMark, credits, year, semester);
+        studentController.saveModule(student.getStudentId(), module);
+
+        // Add to in-memory list
+        modules.add(module);
+        JOptionPane.showMessageDialog(null, "Module added successfully!");
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Invalid input. Please enter valid numbers for marks, credits, year, and semester.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "An error occurred while adding the module.", "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+}
+
+
+
+ // GENERATING A TRANSCRIPT AS TXT
 private void generateTranscriptAsTxt() {
     if (student == null) {
         JOptionPane.showMessageDialog(null, "No student details available to generate transcript.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -196,30 +210,46 @@ private void generateTranscriptAsTxt() {
     String fileName = student.getStudentId() + "_transcript.txt";
 
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-        writer.write("UNOFFICIAL TRANSCRIPT OF ACADEMIC RECORD\n");
-        writer.write("_____________________________________________\n");
+        writer.write("TRANSCRIPT OF ACADEMIC RECORD\n");
+        writer.write("_________________________________________________________________________________________________\n");
         writer.write("Student Name: " + student.getFullnames() + "\n");
         writer.write("Student ID: " + student.getStudentId() + "\n");
         writer.write("Date of Birth: " + student.getDateOfBirth() + "\n\n");
 
-        writer.write("2022 - 2023 SEMESTER ONE Level 100 Bachelor of Science, Computer Science & Software Engineering\n");
-        writer.write("--------------------------------------------------------------------------------------------\n");
-        writer.write(String.format("%-20s %-40s %-8s\n", "MODULE CODE", "MODULE DESCRIPTION", "CREDITS"));
-        writer.write("--------------------------------------------------------------------------------------------\n");
+        // Get unique years and semesters from the modules
+        Set<Integer> years = new HashSet<>();
+        Set<Integer> semesters = new HashSet<>();
+        for (Module module : modules) {
+            years.add(module.getModuleYear());
+            semesters.add(module.getModuleSemester());
+        }
 
-        // Write Modules for Semester One
-        modules.stream()
-                .filter(module -> module.getModuleYear() == 2022 && module.getModuleSemester() == 1)
-                .forEach(module -> {
-                    try {
+        // Iterate over years and semesters
+        for (Integer year : years) {
+            for (Integer semester : semesters) {
+                // Replace with the student's program dynamically
+                writer.write(year + " - " + (year + 1) + " SEMESTER " + semester + " " + student.getProgramme() + "\n");
+                writer.write("__________________________________________________________________________________________________\n");
+                writer.write(String.format("%-20s %-40s %-8s\n", "MODULE CODE", "MODULE DESCRIPTION", "CREDITS"));
+                writer.write("____________________________________________________________________________________________________\n");
+
+                // Write Modules for the current year and semester
+                boolean moduleWritten = false;
+                for (Module module : modules) {
+                    if (module.getModuleYear() == year && module.getModuleSemester() == semester) {
                         writer.write(String.format("%-20s %-40s %-8s\n", 
                             module.getModuleCode(),
                             module.getModuleName(),
                             module.getNumberOfCredits()));
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        moduleWritten = true;
                     }
-                });
+                }
+
+                if (!moduleWritten) {
+                    writer.write("No modules found for this semester.\n");
+                }
+            }
+        }
 
         // Write SGPA and CGPA
         Transcript transcript = new Transcript(student);
@@ -254,32 +284,48 @@ private void generateTranscriptAsPdf() {
         document.open();
 
         // Add header
-        document.add(new com.itextpdf.text.Paragraph("UNOFFICIAL TRANSCRIPT OF ACADEMIC RECORD"));
-        document.add(new com.itextpdf.text.Paragraph("_____________________________________________"));
+        document.add(new com.itextpdf.text.Paragraph("TRANSCRIPT OF ACADEMIC RECORD"));
+        document.add(new com.itextpdf.text.Paragraph("_____________________________________________________"));
         document.add(new com.itextpdf.text.Paragraph("Student Name: " + student.getFullnames()));
         document.add(new com.itextpdf.text.Paragraph("Student ID: " + student.getStudentId()));
         document.add(new com.itextpdf.text.Paragraph("Date of Birth: " + student.getDateOfBirth()));
         document.add(new com.itextpdf.text.Paragraph("\n\n"));
 
-        document.add(new com.itextpdf.text.Paragraph("2022 - 2023 SEMESTER ONE Level 100 Bachelor of Science, Computer Science & Software Engineering"));
-        document.add(new com.itextpdf.text.Paragraph("--------------------------------------------------------------------------------------------"));
-        document.add(new com.itextpdf.text.Paragraph(String.format("%-20s %-40s %-8s", 
-            "MODULE CODE", "MODULE DESCRIPTION", "CREDITS")));
-        document.add(new com.itextpdf.text.Paragraph("--------------------------------------------------------------------------------------------"));
+        // Get unique years and semesters from the modules
+        Set<Integer> years = new HashSet<>();
+        Set<Integer> semesters = new HashSet<>();
+        for (Module module : modules) {
+            years.add(module.getModuleYear());
+            semesters.add(module.getModuleSemester());
+        }
 
-        // Write Modules for Semester One
-        modules.stream()
-                .filter(module -> module.getModuleYear() == 2022 && module.getModuleSemester() == 1)
-                .forEach(module -> {
-                    try {
+        // Iterate over years and semesters
+        for (Integer year : years) {
+            for (Integer semester : semesters) {
+                // Replace with the student's program dynamically
+                document.add(new com.itextpdf.text.Paragraph(year + " - " + (year + 1) + " SEMESTER " + semester + " " + student.getProgramme()));
+                document.add(new com.itextpdf.text.Paragraph("________________________________________________________"));
+                document.add(new com.itextpdf.text.Paragraph(String.format("%-20s %-40s %-8s", 
+                    "MODULE CODE", "MODULE DESCRIPTION", "CREDITS")));
+                document.add(new com.itextpdf.text.Paragraph("________________________________________________________"));
+
+                // Write Modules for the current year and semester
+                boolean moduleWritten = false;
+                for (Module module : modules) {
+                    if (module.getModuleYear() == year && module.getModuleSemester() == semester) {
                         document.add(new com.itextpdf.text.Paragraph(String.format("%-20s %-40s %-8s", 
                             module.getModuleCode(),
                             module.getModuleName(),
                             module.getNumberOfCredits())));
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        moduleWritten = true;
                     }
-                });
+                }
+
+                if (!moduleWritten) {
+                    document.add(new com.itextpdf.text.Paragraph("No modules found for this semester."));
+                }
+            }
+        }
 
         // Add SGPA and CGPA
         Transcript transcript = new Transcript(student);
@@ -298,7 +344,6 @@ private void generateTranscriptAsPdf() {
         e.printStackTrace();
     }
 }
-
 
 
 

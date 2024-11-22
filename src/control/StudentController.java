@@ -40,12 +40,11 @@ public class StudentController {
     
 
     // Add a module for a specific student
-  public void saveModule(String studentId, Module module) {
-    // SQL Queries
-    String insertModuleQuery = "INSERT INTO modules (module_code, module_name, credits, year, semester) " +
-                                "VALUES (?, ?, ?, ?, ?) " +
-                                "ON DUPLICATE KEY UPDATE module_name = VALUES(module_name), credits = VALUES(credits), " +
-                                "year = VALUES(year), semester = VALUES(semester)";
+public void saveModule(String studentId, Module module) {
+    String insertModuleQuery = "INSERT INTO modules (module_code, module_name, module_mark, credits, year, semester) " +
+                               "VALUES (?, ?, ?, ?, ?, ?) " +
+                               "ON DUPLICATE KEY UPDATE module_name = VALUES(module_name), module_mark = VALUES(module_mark), " +
+                               "credits = VALUES(credits), year = VALUES(year), semester = VALUES(semester)";
     String linkStudentToModuleQuery = "INSERT INTO student_modules (student_id, module_id) " +
                                        "VALUES (?, (SELECT module_id FROM modules WHERE module_code = ?))";
 
@@ -54,9 +53,10 @@ public class StudentController {
         try (PreparedStatement moduleStmt = connection.prepareStatement(insertModuleQuery)) {
             moduleStmt.setString(1, module.getModuleCode());
             moduleStmt.setString(2, module.getModuleName());
-            moduleStmt.setInt(3, module.getNumberOfCredits());
-            moduleStmt.setInt(4, module.getModuleYear());
-            moduleStmt.setString(5, String.valueOf(module.getModuleSemester()));
+            moduleStmt.setDouble(3, module.getModuleMark()); // Ensure marks are provided
+            moduleStmt.setInt(4, module.getNumberOfCredits());
+            moduleStmt.setInt(5, module.getModuleYear());
+            moduleStmt.setString(6, String.valueOf(module.getModuleSemester()));
             int rowsAffected = moduleStmt.executeUpdate();
             System.out.println("Module table updated: Rows affected = " + rowsAffected);
         }
@@ -75,7 +75,6 @@ public class StudentController {
         e.printStackTrace();
     }
 }
-
 
 
     // Retrieve a student by ID
