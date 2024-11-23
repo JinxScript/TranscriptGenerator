@@ -1,3 +1,8 @@
+/**
+ *
+ * @author Omolemo Tshwaolesele
+ * @studentID 22001043
+ */
 package view;
 
 import control.StudentController;
@@ -231,7 +236,7 @@ private void addModule() {
     String fileName = student.getStudentId() + "_transcript.txt";
 
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-        writer.write("TRANSCRIPT OF ACADEMIC RECORD\n");
+        writer.write("STUDENT TRANSCRIPT\n");
         writer.write("_________________________________________________________________________________________________\n");
         writer.write("Student Name: " + student.getFullnames() + "\n");
         writer.write("Student ID: " + student.getStudentId() + "\n");
@@ -251,7 +256,7 @@ private void addModule() {
                 // Replace with the student's program dynamically
                 writer.write(year + " - " + (year + 1) + " SEMESTER " + semester + " " + student.getProgramme() + "\n");
                 writer.write("__________________________________________________________________________________________________\n");
-                writer.write(String.format("%-20s %-40s %-8s\n", "MODULE CODE", "MODULE DESCRIPTION", "GRADE","CREDITS"));
+                writer.write(String.format("%-20s %-40s %-8s\n", "MODULE CODE", "MODULE DESCRIPTION", "MARK","GRADE","CREDITS"));
                 writer.write("____________________________________________________________________________________________________\n");
 
                 // Write Modules for the current year and semester
@@ -303,7 +308,7 @@ private void generateTranscriptAsPdf() {
         document.open();
 
         // Add header
-        document.add(new com.itextpdf.text.Paragraph("TRANSCRIPT OF ACADEMIC RECORD"));
+        document.add(new com.itextpdf.text.Paragraph("STUDENT TRANSCRIPT"));
         document.add(new com.itextpdf.text.Paragraph("_____________________________________________________"));
         document.add(new com.itextpdf.text.Paragraph("Student Name: " + student.getFullnames()));
         document.add(new com.itextpdf.text.Paragraph("Student ID: " + student.getStudentId()));
@@ -353,7 +358,7 @@ private void generateTranscriptAsPdf() {
         transcript.calculateSGPA();
         transcript.calculateCGPA();
 
-        document.add(new com.itextpdf.text.Paragraph("\nResults: Academic Good Standing"));
+        //document.add(new com.itextpdf.text.Paragraph("\nResults: Academic Good Standing"));
         document.add(new com.itextpdf.text.Paragraph("SGPA: " + String.format("%.2f", transcript.getSGPA())));
         document.add(new com.itextpdf.text.Paragraph("CGPA: " + String.format("%.2f", transcript.getCGPA())));
 

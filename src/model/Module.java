@@ -1,5 +1,7 @@
 /**
- * Module Class
+ *
+ * @author Omolemo Tshwaolesele
+ * @studentID 22001043
  */
 package model;
 

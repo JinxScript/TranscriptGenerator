@@ -1,3 +1,8 @@
+/**
+ *
+ * @author Omolemo Tshwaolesele
+ * @studentID 22001043
+ */
 package view;
 
 import control.AuthenticationController;
