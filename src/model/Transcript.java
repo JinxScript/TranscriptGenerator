@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Transcript {
+
     private Student student;
     private List<Module> modules;
     private double SGPA;
@@ -25,14 +26,17 @@ public class Transcript {
         modules.add(module);
     }
 
-    // Calculate SGPA
+    // Calculate SGPA based on grade points and credits
     public void calculateSGPA() {
         double totalPoints = 0;
         int totalCredits = 0;
+
         for (Module module : modules) {
-            totalPoints += module.getModuleMark() * module.getNumberOfCredits();
+            double gradePoint = getGradePoint(module.getModuleMark()); // Convert marks to grade points
+            totalPoints += gradePoint * module.getNumberOfCredits();
             totalCredits += module.getNumberOfCredits();
         }
+
         this.SGPA = totalCredits > 0 ? totalPoints / totalCredits : 0;
     }
 
@@ -40,6 +44,24 @@ public class Transcript {
     public void calculateCGPA() {
         // For simplicity, using SGPA as CGPA (modify logic if required)
         this.CGPA = this.SGPA;
+    }
+
+    private double getGradePoint(double marks) {
+        if (marks >= 90) {
+            return 5.0;
+        } else if (marks >= 80) {
+            return 4.5;
+        } else if (marks >= 70) {
+            return 4.0;
+        } else if (marks >= 60) {
+            return 3.5;
+        } else if (marks >= 50) {
+            return 3.0;
+        } else if (marks >= 40) {
+            return 2.0;
+        } else {
+            return 0; // Fail
+        }
     }
 
     // Generate Transcript in String format

@@ -368,13 +368,14 @@ private void generateTranscriptAsPdf() {
 
 
 
-    private void calculateSGPA() {
-        Transcript transcript = new Transcript(student);
-        modules.forEach(transcript::addModule);
+  private void calculateSGPA() {
+    Transcript transcript = new Transcript(student);
+    modules.forEach(transcript::addModule);
 
-        transcript.calculateSGPA();
-        JOptionPane.showMessageDialog(null, "SGPA: " + String.format("%.2f", transcript.getSGPA()));
-    }
+    transcript.calculateSGPA(); // Recalculates SGPA for all added modules
+    JOptionPane.showMessageDialog(null, "SGPA: " + String.format("%.2f", transcript.getSGPA()));
+}
+
 
     private void generateTranscript() {
         Transcript transcript = new Transcript(student);

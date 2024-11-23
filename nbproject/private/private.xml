@@ -3,12 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/Users/Omolemo/Desktop/Year%203%20Semester%201/Comp%20311%20-%20Programming%20in%20Java/Labs/TranscriptGenerator/src/view/LoginView.java</file>
             <file>file:/C:/Users/Omolemo/Desktop/Year%203%20Semester%201/Comp%20311%20-%20Programming%20in%20Java/Labs/TranscriptGenerator/src/control/RegistryController.java</file>
-            <file>file:/C:/Users/Omolemo/Desktop/Year%203%20Semester%201/Comp%20311%20-%20Programming%20in%20Java/Labs/TranscriptGenerator/src/control/StudentController.java</file>
-            <file>file:/C:/Users/Omolemo/Desktop/Year%203%20Semester%201/Comp%20311%20-%20Programming%20in%20Java/Labs/TranscriptGenerator/src/model/Module.java</file>
             <file>file:/C:/Users/Omolemo/Desktop/Year%203%20Semester%201/Comp%20311%20-%20Programming%20in%20Java/Labs/TranscriptGenerator/src/view/RegistryView.java</file>
-            <file>file:/C:/Users/Omolemo/Desktop/Year%203%20Semester%201/Comp%20311%20-%20Programming%20in%20Java/Labs/TranscriptGenerator/src/model/Student.java</file>
+            <file>file:/C:/Users/Omolemo/Desktop/Year%203%20Semester%201/Comp%20311%20-%20Programming%20in%20Java/Labs/TranscriptGenerator/src/view/LandingPage.java</file>
             <file>file:/C:/Users/Omolemo/Desktop/Year%203%20Semester%201/Comp%20311%20-%20Programming%20in%20Java/Labs/TranscriptGenerator/src/view/StudentView.java</file>
+            <file>file:/C:/Users/Omolemo/Desktop/Year%203%20Semester%201/Comp%20311%20-%20Programming%20in%20Java/Labs/TranscriptGenerator/src/control/GradeCalculator.java</file>
+            <file>file:/C:/Users/Omolemo/Desktop/Year%203%20Semester%201/Comp%20311%20-%20Programming%20in%20Java/Labs/TranscriptGenerator/src/main/MainApp.java</file>
+            <file>file:/C:/Users/Omolemo/Desktop/Year%203%20Semester%201/Comp%20311%20-%20Programming%20in%20Java/Labs/TranscriptGenerator/src/view/TranscriptView.java</file>
         </group>
     </open-files>
 </project-private>
